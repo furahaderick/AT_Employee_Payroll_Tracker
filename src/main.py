@@ -1,9 +1,4 @@
-# TODO: generate payslip,
-
-
 from src.exceptions import (
-    # InvalidEmployeeTypeException,
-    # EmployeeAlreadyExistsException,
     EmployeeNotFoundException,
     InvalidOperationSelection,
 )
@@ -60,6 +55,8 @@ def main():
                     generate_payslips()
                 except EmployeeNotFoundException as e:
                     print(e)
+                except ValueError:
+                    print("Please enter valid number of hours")
 
 
 if __name__ == "__main__":

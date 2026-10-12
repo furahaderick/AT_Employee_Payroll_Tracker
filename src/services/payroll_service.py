@@ -8,6 +8,7 @@ from src.exceptions import (
 )
 from src.models.base_employee import Employee
 from src.models.employee_factory import EmployeeFactory
+from src.utils import input_positive_number
 
 
 employees: list[Employee] = []
@@ -80,7 +81,7 @@ def generate_payslips():
         raise EmployeeNotFoundException(f"Employee with ID {identifier} not found")
 
     if isinstance(employee, ContractualEmployee):
-        hours_worked = float(input("Enter total hours worked: "))
+        hours_worked = input_positive_number("total number of hours")
         employee.generate_payslip(hours_worked=hours_worked)
 
     elif isinstance(employee, FulltimeEmployee):
