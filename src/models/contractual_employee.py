@@ -3,8 +3,10 @@ from src.models.base_employee import Employee
 
 class ContractualEmployee(Employee):
 
-    def __init__(self, identifier: str, name: str, rate: float) -> None:
-        super().__init__(identifier, name)
+    def __init__(
+        self, identifier: str, name: str, rate: float, bonus: float, tax_rate: float
+    ) -> None:
+        super().__init__(identifier, name, bonus, tax_rate)
         self.rate = rate
 
     @property
@@ -19,12 +21,18 @@ class ContractualEmployee(Employee):
         self._rate = rate
 
     # pylint: disable=arguments-differ
-    def generate_payslip(self, hours_worked) -> None:
-        compensation = self.rate * hours_worked
-        print("\n== PAYSLIP ==")
-        print(self)
-        print(f"Hours worked:  {hours_worked}")
-        print(f"Gross compensation: {compensation}")
+    def generate_payslip(self) -> str:
+        compensation = self.calculate_compensation()
+        payslip = (
+            "\n== PAYSLIP ==\n"
+            f"{self}\n"
+            f"Hours worked:  {self.hours_worked}\n"
+            f"Gross compensation: {compensation}\n"
+            f"Bonus: {self.bonus}\n"
+            f"Tax: {self.tax_amount}\n"
+            f"Net pay: {self.net_pay}"
+        )
+        return payslip
 
     def __str__(self) -> str:
         return (
@@ -35,5 +43,5 @@ class ContractualEmployee(Employee):
         )
 
     # pylint: disable=arguments-differ
-    def calculate_compensation(self, hours_worked: float) -> float:
-        return self.rate * hours_worked
+    def calculate_compensation(self) -> float:
+        return self.rate * self.hours_worked

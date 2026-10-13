@@ -3,8 +3,10 @@ from src.models.base_employee import Employee
 
 class Intern(Employee):
 
-    def __init__(self, identifier: str, name: str, stipend: float) -> None:
-        super().__init__(identifier, name)
+    def __init__(
+        self, identifier: str, name: str, stipend: float, bonus: float, tax_rate: float
+    ) -> None:
+        super().__init__(identifier, name, bonus, tax_rate)
         self.stipend = stipend
 
     @property
@@ -19,11 +21,17 @@ class Intern(Employee):
         self._stipend = stipend
 
     # pylint: disable=arguments-differ
-    def generate_payslip(self) -> None:
-        compensation = self.stipend
-        print("\n== PAYSLIP ==")
-        print(self)
-        print(f"Gross compensation: {compensation}")
+    def generate_payslip(self) -> str:
+        compensation = self.calculate_compensation()
+        payslip = (
+            "\n== PAYSLIP ==\n"
+            f"{self}\n"
+            f"Gross compensation: {compensation}\n"
+            f"Bonus: {self.bonus}\n"
+            f"Tax: {self.tax_amount}\n"
+            f"Net pay: {self.net_pay}"
+        )
+        return payslip
 
     def __str__(self) -> str:
         return (
