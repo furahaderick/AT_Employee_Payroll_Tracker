@@ -1,125 +1,119 @@
 # Employee Payroll Tracker
 
-A command-line system that computes payslips for multiple employee categories including full-time employees, contractual workers, and interns.
+A command-line payroll management system that computes payslips for multiple employee categories including full-time employees, contractual workers, and interns.
 
 ---
 
-## 🚀 Overview
+## 📋 Overview
 
-Managing payroll for different types of employees requires distinct compensation calculations. This project provides a unified interface to:
+The Employee Payroll Tracker is a Python-based CLI application designed to streamline payroll calculations for organizations with diverse workforce types. The system provides a simple interactive menu for managing employee records and generating detailed payslips with accurate tax computations.
 
-- **Register employees** across three categories: full-time, contractual, and interns
-- **Track employee data** including IDs, names, and compensation parameters
-- **Generate payslips** with category-specific calculations (salary, hourly rate, or stipend)
-- **Validate inputs** to prevent duplicate IDs and invalid compensation values
+Key capabilities include:
 
-The system uses object-oriented design patterns including the Factory pattern for employee creation and abstract base classes for consistent behavior across employee types.
+- Support for three employee types: full-time, contractual, and intern
+- Flexible compensation calculation based on employment type
+- Automatic tax computation with configurable tax rates
+- Bonus management across all employee categories
+- In-memory employee record storage and retrieval
+- Input validation with user-friendly error messages
+- Clean, object-oriented architecture using inheritance and factory patterns
 
 ---
 
-## 🧠 Architecture Diagram
+## 🏗️ Architecture
+
+The application follows a layered architecture with clear separation of concerns:
 
 ```mermaid
 classDiagram
     class Employee {
         <<abstract>>
-        +str identifier
-        +str name
+        +identifier: str
+        +name: str
+        +_bonus: float
+        +_tax_rate: float
+        +hours_worked: float
         +calculate_compensation() float
-        +__str__() str
-        +generate_payslip() None
+        +generate_payslip() str
+        +apply_tax() void
     }
-    
+
     class FulltimeEmployee {
-        -float _salary
-        +salary float
+        +salary: float
         +calculate_compensation() float
-        +generate_payslip() None
-        +__str__() str
     }
-    
+
     class ContractualEmployee {
-        -float _rate
-        +rate float
-        +calculate_compensation(hours_worked) float
-        +generate_payslip(hours_worked) None
-        +__str__() str
-    }
-    
-    class Intern {
-        -float _stipend
-        +stipend float
+        +rate: float
         +calculate_compensation() float
-        +generate_payslip() None
-        +__str__() str
     }
-    
+
+    class Intern {
+        +stipend: float
+        +calculate_compensation() float
+    }
+
     class EmployeeFactory {
-        +create_fulltime_employee(identifier, name, salary) FulltimeEmployee
-        +create_contractual_employee(identifier, name, rate) ContractualEmployee
-        +create_intern(identifier, name, stipend) Intern
+        +create_fulltime_employee() FulltimeEmployee
+        +create_contractual_employee() ContractualEmployee
+        +create_intern() Intern
     }
-    
+
     class PayrollService {
-        -list[Employee] employees
-        +get_employee_by_id(identifier) Employee
-        +create_new_employee() None
-        +display_all_employees() None
-        +generate_payslips() None
+        +create_new_employee() void
+        +display_all_employees() void
+        +generate_payslips() void
     }
-    
+
     Employee <|-- FulltimeEmployee
     Employee <|-- ContractualEmployee
     Employee <|-- Intern
-    EmployeeFactory ..> FulltimeEmployee : creates
-    EmployeeFactory ..> ContractualEmployee : creates
-    EmployeeFactory ..> Intern : creates
-    PayrollService --> Employee : manages
-    PayrollService --> EmployeeFactory : uses
+    EmployeeFactory --> FulltimeEmployee
+    EmployeeFactory --> ContractualEmployee
+    EmployeeFactory --> Intern
+    PayrollService --> Employee
 ```
 
 ---
 
-## ⚙️ Tech Stack
+## 🛠️ Tech Stack
 
 - **Language**: Python 3.12+
-- **Build System**: Poetry (poetry-core >=2.0.0)
-- **Design Patterns**: Factory Pattern, Abstract Base Classes
-- **Architecture**: Object-oriented, layered (models, services, exceptions)
+- **Build System**: Poetry
+- **Architecture Pattern**: Object-Oriented Design (OOP)
+- **Design Patterns**: Factory Pattern, Template Method Pattern
+- **Dependencies**: None (pure Python standard library)
 
 ---
 
-## 🛠️ Setup Instructions
+## ⚙️ Setup Instructions
 
 ### Prerequisites
 
-- Python 3.12 or higher
-- Poetry (for package management, optional for running the application)
+- Python 3.12 or higher installed on your system
+- Poetry (optional, for build management)
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Employee_Payroll_Tracker
-   ```
+1. Clone the repository:
 
-2. **Create a virtual environment**
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
+```bash
+git clone <repository-url>
+cd Employee_Payroll_Tracker
+```
 
-3. **Install dependencies**
-   ```bash
-   # Using Poetry (recommended)
-   poetry install
-   
-   # Or using pip (if not using Poetry)
-   pip install -e .
-   ```
+2. Create a virtual environment (recommended):
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+```
+
+3. The project has no external dependencies, so no package installation is required.
 
 ### Running the Application
+
+Execute the application using Python's module runner:
 
 ```bash
 python -m src.main
@@ -129,251 +123,283 @@ The application will launch an interactive menu in your terminal.
 
 ---
 
-## 📡 Usage Documentation
+## 📖 Usage Guide
 
-This is a CLI application with an interactive menu-driven interface.
+### Main Menu
 
-### Main Menu Operations
+Upon launching, you will see the operations menu:
 
-#### 1. Add a New Employee
+```
+=== Employee Payroll Tracker ===
 
-Prompts for employee type and details:
+Operations Menu
+1. Add a new employee
+2. Display all employees
+3. Generate payslips
+0. Exit
+```
 
-- **Full-time employee**: Requires ID, name, and salary
-- **Contractual employee**: Requires ID, name, and hourly rate
-- **Intern**: Requires ID, name, and stipend
+### Adding an Employee
 
-**Example interaction:**
+Select option `1` to add a new employee. You will be prompted for:
+
+1. **Employee Type**: Enter `fulltime`, `contractual`, or `intern`
+2. **Employee ID**: A unique identifier (e.g., `E001`)
+3. **Employee Name**: The employee's full name
+4. **Bonus**: A positive whole number
+5. **Tax Rate**: A percentage between 1 and 100
+6. **Type-specific field**:
+   - Full-time: salary (positive whole number)
+   - Contractual: hourly rate (positive whole number)
+   - Intern: stipend (positive whole number)
+
+**Example session for a contractual employee:**
+
 ```
 Select desired operation (number): 1
-Enter employee type (fulltime, contractual, intern): fulltime
-Enter employee ID: EMP001
-Enter employee name: John Doe
-Enter his/her salary: 5000
+
+Enter employee type (fulltime, contractual, intern): contractual
+Enter employee ID: E001
+Enter employee name: Derick Dukundane
+Enter the bonus: 45000
+Enter the tax rate percentage (1-100): 12
+Enter the rate: 24
 
 Employee added successfully!
-Employee Name: John Doe
-Employee ID: EMP001
+Employee Name: Derick Dukundane
+Employee ID: E001
 ```
 
-#### 2. Display All Employees
+### Displaying All Employees
 
-Lists all registered employees with their details.
+Select option `2` to view all registered employees:
 
-**Example output:**
 ```
+Select desired operation (number): 2
+
 All employees
 
 ----------------------------------------
-Employee ID:    EMP001
-Employee Type:    Full-time
-Employee Name:    John Doe
-Employee Salary:    5000.0
-----------------------------------------
-Employee ID:    EMP002
+Employee ID:    E001
 Employee Type:    Contractual
-Employee Name:    Jane Smith
-Employee Rate:    25.0
+Employee Name:    Derick Dukundane
+Employee Rate:    24
 ```
 
-#### 3. Generate Payslips
+### Generating Payslips
 
-Generates a payslip for a specific employee by ID.
+Select option `3` to generate a payslip for a specific employee:
 
-- **Full-time employees**: Displays salary as gross compensation
-- **Contractual employees**: Prompts for hours worked, calculates rate × hours
-- **Interns**: Displays stipend as gross compensation
+1. Enter the employee ID
+2. For contractual employees only: enter the total number of hours worked
+3. The system calculates and displays the payslip
 
-**Example interaction:**
+**Example session:**
+
 ```
 Select desired operation (number): 3
-Enter employee ID: EMP002
-Enter total hours worked: 40
+
+Enter employee ID: E001
+Enter the total number of hours: 75
 
 == PAYSLIP ==
-Employee ID:    EMP002
+Employee ID:    E001
 Employee Type:    Contractual
-Employee Name:    Jane Smith
-Employee Rate:    25.0
-Hours worked:  40.0
-Gross compensation: 1000.0
+Employee Name:    Derick Dukundane
+Employee Rate:    24
+Hours worked:  75
+Gross compensation: 1800
+Bonus: 45000
+Tax: 216.0
+Net pay: 1584.0
 ```
 
-#### 0. Exit
+### Exiting the Application
 
-Terminates the application.
-
----
-
-## 🔄 Core Concepts
-
-### Employee Types
-
-1. **Full-time Employee**
-   - Fixed salary compensation
-   - No additional parameters needed for payslip generation
-   - Salary must be non-negative
-
-2. **Contractual Employee**
-   - Hourly rate compensation
-   - Requires hours worked for payslip calculation
-   - Rate must be non-negative
-
-3. **Intern**
-   - Fixed stipend compensation
-   - No additional parameters needed for payslip generation
-   - Stipend must be non-negative
-
-### Data Validation
-
-- **Duplicate IDs**: Prevents multiple employees with the same identifier
-- **Negative compensation**: Validates salary, rate, and stipend are >= 0
-- **Invalid employee types**: Only accepts "fulltime", "contractual", or "intern"
-- **Invalid menu operations**: Only accepts menu options 0-3
+Select option `0` to exit the program gracefully.
 
 ---
 
-## 🚨 Important Mechanisms
+## 🔄 Important Workflows
 
-### Factory Pattern
+### Compensation Calculation Logic
 
-The `EmployeeFactory` class centralizes employee instantiation, ensuring consistent object creation and separating the creation logic from the business logic.
+Each employee type calculates gross compensation differently:
 
-### Property Validation
+- **Full-time Employee**: Fixed salary amount
 
-All employee types use Python properties with setters to validate compensation values at assignment time, preventing negative values.
+   ```
+   Gross compensation = salary
+   ```
 
-### Exception Handling
+- **Contractual Employee**: Hourly rate multiplied by hours worked
 
-Custom exceptions provide clear error messages:
-- `InvalidEmployeeTypeException`: Unknown employee type
-- `EmployeeAlreadyExistsException`: Duplicate employee ID
-- `EmployeeNotFoundException`: Employee ID not found during payslip generation
-- `InvalidOperationSelection`: Invalid menu option
+   ```
+   Gross compensation = rate × hours_worked
+   ```
 
----
+- **Intern**: Fixed stipend amount
+   ```
+   Gross compensation = stipend
+   ```
 
-## ⚠️ Limitations and Future Improvements
+### Tax Calculation
 
-### Current Limitations
+Tax is applied uniformly across all employee types:
 
-- **In-memory storage**: Employee data is stored in a list and lost when the application exits
-- **No persistence**: No database or file-based storage
-- **No tax calculations**: Payslips show gross compensation only
-- **No bulk operations**: Payslips must be generated one employee at a time
-- **No edit/delete functionality**: Cannot modify or remove employees after creation
-- **No test suite**: No automated tests are included
+```
+Tax amount = gross compensation × (tax_rate / 100)
+Net pay = gross compensation + bonus - tax amount
+```
 
-### Potential Future Improvements
+### Input Validation
 
-- Add database persistence (SQLite, PostgreSQL)
-- Implement tax deduction calculations
-- Add bulk payslip generation for all employees
-- Support for editing and deleting employee records
-- Export payslips to PDF or CSV
-- Add automated unit and integration tests
-- Support for additional employee categories
-- Date range filtering for payslip generation
-- Multi-language support
+The application enforces strict input validation:
 
----
+- **Bonus**: Must be a positive whole number greater than 0
+- **Tax Rate**: Must be a number between 1 and 100 (inclusive)
+- **Salary/Rate/Stipend**: Must be positive whole numbers greater than 0
+- **Employee ID**: Must be unique (duplicate IDs are rejected)
+- **Employee Type**: Must be one of `fulltime`, `contractual`, or `intern`
 
-## 🧪 Testing and Manual Testing Scenarios
+Invalid inputs trigger clear error messages and prompt for re-entry.
 
-### Manual Testing
+### Employee Creation Workflow
 
-Since no automated tests are currently included, manual testing can be performed through the interactive CLI:
-
-**Test Case 1: Add Full-time Employee**
-1. Run the application
-2. Select option 1
-3. Enter type: `fulltime`
-4. Enter ID: `FT001`
-5. Enter name: `Alice Johnson`
-6. Enter salary: `6000`
-7. Verify success message
-
-**Test Case 2: Add Contractual Employee**
-1. Select option 1
-2. Enter type: `contractual`
-3. Enter ID: `CT001`
-4. Enter name: `Bob Williams`
-5. Enter rate: `30`
-6. Verify success message
-
-**Test Case 3: Add Intern**
-1. Select option 1
-2. Enter type: `intern`
-3. Enter ID: `IN001`
-4. Enter name: `Charlie Brown`
-5. Enter stipend: `1500`
-6. Verify success message
-
-**Test Case 4: Duplicate ID Prevention**
-1. Attempt to add an employee with an existing ID
-2. Verify `EmployeeAlreadyExistsException` is raised
-
-**Test Case 5: Negative Value Validation**
-1. Attempt to add an employee with negative salary/rate/stipend
-2. Verify `ValueError` is raised
-
-**Test Case 6: Invalid Employee Type**
-1. Enter an invalid employee type (e.g., "manager")
-2. Verify `InvalidEmployeeTypeException` is raised
-
-**Test Case 7: Generate Payslip for Contractual Employee**
-1. Select option 3
-2. Enter contractual employee ID
-3. Enter hours worked: `45`
-4. Verify correct compensation calculation (rate × hours)
-
-**Test Case 8: Non-existent Employee Payslip**
-1. Select option 3
-2. Enter a non-existent employee ID
-3. Verify `EmployeeNotFoundException` is raised
+1. User selects employee type from the three supported categories
+2. System validates the employee type
+3. User provides employee ID (validated for uniqueness)
+4. User provides name (no validation)
+5. User provides bonus (validated as positive number)
+6. User provides tax rate (validated as 1-100)
+7. Based on type, user provides salary/rate/stipend (validated as positive)
+8. EmployeeFactory creates the appropriate employee instance
+9. Employee is added to the in-memory registry
+10.   Success confirmation is displayed
 
 ---
 
-## 📦 Project Structure
+## ⚠️ Limitations
+
+- **Data Persistence**: Employee records are stored in memory only. All data is lost when the application exits.
+- **Single Session**: Only one payroll session can be active at a time.
+- **No Batch Operations**: Payslips must be generated individually for each employee.
+- **No Data Export**: Payslips are displayed on-screen only; there is no file export or printing capability.
+- **No Edit/Delete**: Once an employee is added, their information cannot be modified or removed.
+- **Manual Input**: All data must be entered manually; there is no file import capability.
+- **No Authentication**: The application has no user authentication or access control.
+- **Limited Validation**: Name fields are not validated for format or length.
+
+---
+
+## 🚀 Future Improvements
+
+Potential enhancements for future versions:
+
+- Add database persistence (SQLite, PostgreSQL) to store employee records permanently
+- Implement employee edit and delete functionality
+- Add batch payslip generation for multiple employees
+- Support payslip export to PDF or CSV formats
+- Add file import for bulk employee data loading
+- Implement user authentication and role-based access control
+- Add support for additional employee types (e.g., commission-based, part-time)
+- Include payroll history and audit trails
+- Add reporting features (payroll summaries, tax reports)
+- Implement configuration file support for default tax rates and bonuses
+- Add unit and integration tests
+- Support multiple currencies and locale-specific formatting
+
+---
+
+## 🧪 Testing
+
+The project currently does not include automated tests. Manual testing can be performed by:
+
+1. Running the application with `python -m src.main`
+2. Testing each employee type (fulltime, contractual, intern)
+3. Verifying input validation with invalid inputs (negative numbers, non-numeric values, out-of-range percentages)
+4. Testing duplicate employee ID handling
+5. Generating payslips for each employee type
+6. Verifying tax calculations manually
+
+---
+
+## 📁 Project Structure
 
 ```
 Employee_Payroll_Tracker/
-├── .gitignore              # Python gitignore configuration
-├── pyproject.toml          # Project metadata and Poetry configuration
+├── pyproject.toml          # Project metadata and build configuration
 ├── README.md               # This file
-├── .venv/                  # Virtual environment (excluded from git)
+├── .gitignore              # Git ignore rules
 └── src/
-    ├── __pycache__/        # Python bytecode cache (excluded from git)
-    ├── exceptions.py       # Custom exception definitions
-    ├── main.py             # Application entry point and CLI interface
+    ├── main.py             # Application entry point and menu system
+    ├── exceptions.py       # Custom exception classes
+    ├── utils.py            # Input validation utilities
     ├── models/
-    │   ├── __pycache__/    # Model bytecode cache
-    │   ├── base_employee.py          # Abstract base class for employees
-    │   ├── contractual_employee.py   # Contractual employee implementation
-    │   ├── employee_factory.py       # Factory for employee creation
+    │   ├── base_employee.py           # Abstract base class for all employees
     │   ├── fulltime_employee.py      # Full-time employee implementation
-    │   └── intern.py                 # Intern implementation
+    │   ├── contractual_employee.py   # Contractual employee implementation
+    │   ├── intern.py                 # Intern implementation
+    │   └── employee_factory.py      # Factory for creating employee instances
     └── services/
-        ├── __pycache__/    # Service bytecode cache
         └── payroll_service.py        # Business logic for payroll operations
 ```
 
-### Key Files
+### File Descriptions
 
-- **src/main.py**: Entry point with interactive menu system
-- **src/exceptions.py**: Custom exception classes for error handling
-- **src/models/base_employee.py**: Abstract base class defining employee interface
-- **src/models/employee_factory.py**: Factory pattern implementation for employee creation
-- **src/models/fulltime_employee.py**: Full-time employee with salary-based compensation
-- **src/models/contractual_employee.py**: Contractual employee with hourly rate compensation
-- **src/models/intern.py**: Intern with stipend-based compensation
-- **src/services/payroll_service.py**: Service layer managing employee data and operations
+- **src/main.py**: Contains the main loop and interactive menu. Handles user input routing and operation selection.
+- **src/exceptions.py**: Defines custom exceptions: `InvalidEmployeeTypeException`, `EmployeeAlreadyExistsException`, `InvalidOperationSelection`, and `EmployeeNotFoundException`.
+- **src/utils.py**: Provides reusable input validation functions: `input_positive_number()` and `input_percentage()`.
+- **src/models/base_employee.py**: Abstract base class defining the common interface and properties for all employee types.
+- **src/models/fulltime_employee.py**: Concrete implementation for full-time employees with salary-based compensation.
+- **src/models/contractual_employee.py**: Concrete implementation for contractual employees with hourly rate-based compensation.
+- **src/models/intern.py**: Concrete implementation for interns with stipend-based compensation.
+- **src/models/employee_factory.py**: Factory class with static methods for creating different employee types.
+- **src/services/payroll_service.py**: Service layer containing employee management and payslip generation logic.
 
 ---
 
-## 👨‍💻 Author and License
+## Design Decisions
 
-**Author**: furahayves  
-**Email**: yvesderricks@gmail.com
+### Object-Oriented Design
 
-**License**: Not specified
+The application uses inheritance to share common functionality (bonus, tax calculation, payslip generation) while allowing each employee type to implement its own compensation calculation logic.
+
+### Factory Pattern
+
+The `EmployeeFactory` centralizes employee creation logic, making it easy to add new employee types in the future without modifying existing code.
+
+### In-Memory Storage
+
+The current implementation uses simple Python lists and dictionaries for storage. This keeps the application lightweight and dependency-free but limits data persistence.
+
+### Input Validation
+
+Comprehensive input validation is implemented at the utility level to ensure data integrity and provide clear user feedback before object creation.
+
+---
+
+## Error Handling
+
+The application handles errors gracefully with custom exceptions:
+
+- **InvalidEmployeeTypeException**: Raised when an unsupported employee type is entered
+- **EmployeeAlreadyExistsException**: Raised when attempting to add an employee with a duplicate ID
+- **EmployeeNotFoundException**: Raised when attempting to generate a payslip for a non-existent employee
+- **InvalidOperationSelection**: Raised when an invalid menu option is selected
+- **ValueError**: Raised for invalid numeric inputs (handled by validation utilities)
+
+All errors are caught and displayed with user-friendly messages without crashing the application.
+
+---
+
+## Author
+
+**furahayves**  
+Email: yvesderricks@gmail.com
+
+---
+
+## License
+
+Please refer to the project repository for license information.
