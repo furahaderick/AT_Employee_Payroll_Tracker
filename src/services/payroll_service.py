@@ -1,6 +1,4 @@
 from src.models.contractual_employee import ContractualEmployee
-from src.models.fulltime_employee import FulltimeEmployee
-from src.models.intern import Intern
 from src.exceptions import (
     EmployeeAlreadyExistsException,
     InvalidEmployeeTypeException,
@@ -8,10 +6,11 @@ from src.exceptions import (
 )
 from src.models.base_employee import Employee
 from src.models.employee_factory import EmployeeFactory
-from src.utils import input_positive_number
+from src.utils import input_positive_number, input_percentage
 
 
 employees: list[Employee] = []
+payroll_data: dict[str, dict] = {}
 
 
 def get_employee_by_id(identifier: str) -> Employee | None:
@@ -35,24 +34,38 @@ def create_new_employee():
         )
 
     name = input("Enter employee name: ")
+    bonus = input_positive_number("bonus")
+    tax_rate = input_percentage("tax rate")
 
     match employee_type:
         case "fulltime":
-            salary = float(input("Enter his/her salary: "))
+            salary = input_positive_number("salary")
             new_employee = EmployeeFactory.create_fulltime_employee(
-                identifier=identifier, name=name, salary=salary
+                identifier=identifier,
+                name=name,
+                salary=salary,
+                bonus=bonus,
+                tax_rate=tax_rate,
             )
 
         case "contractual":
-            rate = float(input("Enter his/her rate: "))
+            rate = input_positive_number("rate")
             new_employee = EmployeeFactory.create_contractual_employee(
-                identifier=identifier, name=name, rate=rate
+                identifier=identifier,
+                name=name,
+                rate=rate,
+                bonus=bonus,
+                tax_rate=tax_rate,
             )
 
         case "intern":
-            stipend = float(input("Enter his/her stipend: "))
+            stipend = input_positive_number("stipend")
             new_employee = EmployeeFactory.create_intern(
-                identifier=identifier, name=name, stipend=stipend
+                identifier=identifier,
+                name=name,
+                stipend=stipend,
+                bonus=bonus,
+                tax_rate=tax_rate,
             )
 
     employees.append(new_employee)
@@ -82,12 +95,17 @@ def generate_payslips():
 
     if isinstance(employee, ContractualEmployee):
         hours_worked = input_positive_number("total number of hours")
-        employee.generate_payslip(hours_worked=hours_worked)
+        employee.hours_worked = hours_worked
 
-    elif isinstance(employee, FulltimeEmployee):
-        employee.generate_payslip()
+    employee.apply_tax()
+    payslip = employee.generate_payslip()
+    print(payslip)
 
-    elif isinstance(employee, Intern):
-        employee.generate_payslip()
+    payroll_data[identifier] = {
+        "gross": employee.calculate_compensation(),
+        "bonus": employee.bonus,
+        "tax": employee.tax_amount,
+        "net_pay": employee.net_pay,
+    }
 
     return
