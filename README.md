@@ -80,9 +80,11 @@ classDiagram
 
 - **Language**: Python 3.12+
 - **Build System**: Poetry
+- **Testing Framework**: pytest
 - **Architecture Pattern**: Object-Oriented Design (OOP)
 - **Design Patterns**: Factory Pattern, Template Method Pattern
-- **Dependencies**: None (pure Python standard library)
+- **Runtime Dependencies**: None (pure Python standard library)
+- **Development Dependencies**: pytest (for testing)
 
 ---
 
@@ -109,7 +111,17 @@ python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
-3. The project has no external dependencies, so no package installation is required.
+3. Install dependencies (optional, for testing):
+
+```bash
+pip install pytest
+```
+
+Or install the development dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
 
 ### Running the Application
 
@@ -306,21 +318,67 @@ Potential enhancements for future versions:
 - Include payroll history and audit trails
 - Add reporting features (payroll summaries, tax reports)
 - Implement configuration file support for default tax rates and bonuses
-- Add unit and integration tests
+- Expand test coverage with integration tests for the service layer
+- Add test coverage for input validation utilities
 - Support multiple currencies and locale-specific formatting
 
 ---
 
 ## 🧪 Testing
 
-The project currently does not include automated tests. Manual testing can be performed by:
+The project includes unit tests for the core employee classes using pytest.
 
-1. Running the application with `python -m src.main`
-2. Testing each employee type (fulltime, contractual, intern)
-3. Verifying input validation with invalid inputs (negative numbers, non-numeric values, out-of-range percentages)
-4. Testing duplicate employee ID handling
-5. Generating payslips for each employee type
-6. Verifying tax calculations manually
+### Running Tests
+
+1. Install the development dependencies:
+
+```bash
+pip install pytest
+```
+
+Or using the optional dependencies:
+
+```bash
+pip install -e ".[dev]"
+```
+
+2. Run the test suite:
+
+```bash
+pytest
+```
+
+Or run with verbose output:
+
+```bash
+pytest -v
+```
+
+### Test Coverage
+
+The test suite includes 7 unit tests covering:
+
+- Full-time employee compensation calculation
+- Full-time employee tax calculation
+- Full-time employee net pay calculation
+- Contractual employee compensation calculation
+- Contractual employee tax calculation
+- Intern compensation calculation
+- Intern net pay calculation
+- Employee factory creation
+
+All tests verify the core payroll calculation logic for each employee type.
+
+### Manual Testing
+
+For comprehensive manual testing:
+
+1. Run the application with `python -m src.main`
+2. Test each employee type (fulltime, contractual, intern)
+3. Verify input validation with invalid inputs (negative numbers, non-numeric values, out-of-range percentages)
+4. Test duplicate employee ID handling
+5. Generate payslips for each employee type
+6. Verify tax calculations manually
 
 ---
 
@@ -331,18 +389,21 @@ Employee_Payroll_Tracker/
 ├── pyproject.toml          # Project metadata and build configuration
 ├── README.md               # This file
 ├── .gitignore              # Git ignore rules
-└── src/
-    ├── main.py             # Application entry point and menu system
-    ├── exceptions.py       # Custom exception classes
-    ├── utils.py            # Input validation utilities
-    ├── models/
-    │   ├── base_employee.py           # Abstract base class for all employees
-    │   ├── fulltime_employee.py      # Full-time employee implementation
-    │   ├── contractual_employee.py   # Contractual employee implementation
-    │   ├── intern.py                 # Intern implementation
-    │   └── employee_factory.py      # Factory for creating employee instances
-    └── services/
-        └── payroll_service.py        # Business logic for payroll operations
+├── src/
+│   ├── main.py             # Application entry point and menu system
+│   ├── exceptions.py       # Custom exception classes
+│   ├── utils.py            # Input validation utilities
+│   ├── models/
+│   │   ├── base_employee.py           # Abstract base class for all employees
+│   │   ├── fulltime_employee.py      # Full-time employee implementation
+│   │   ├── contractual_employee.py   # Contractual employee implementation
+│   │   ├── intern.py                 # Intern implementation
+│   │   └── employee_factory.py      # Factory for creating employee instances
+│   └── services/
+│       └── payroll_service.py        # Business logic for payroll operations
+└── tests/
+    ├── __init__.py          # Test package initialization
+    └── test_employee.py    # Unit tests for employee classes
 ```
 
 ### File Descriptions
@@ -356,6 +417,8 @@ Employee_Payroll_Tracker/
 - **src/models/intern.py**: Concrete implementation for interns with stipend-based compensation.
 - **src/models/employee_factory.py**: Factory class with static methods for creating different employee types.
 - **src/services/payroll_service.py**: Service layer containing employee management and payslip generation logic.
+- **tests/**init**.py**: Test package initialization file.
+- **tests/test_employee.py**: Unit tests for employee classes covering compensation, tax, and net pay calculations.
 
 ---
 
